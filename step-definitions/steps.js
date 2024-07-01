@@ -25,5 +25,4 @@ When(/^I apply below filters$/, async (dataTable) => {
 Then(/^I should see list of Samsung phones$/, async () => {
 
     await MobilePhonesPage.verifyListdItemsWithNameContaining('Samsung');
-    await browser.pause(50000);
 });

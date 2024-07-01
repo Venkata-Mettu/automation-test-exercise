@@ -1,4 +1,7 @@
-import allure from 'allure-commandline'
+import fs from 'node:fs/promises'
+import { generate } from 'multiple-cucumber-html-reporter'
+import cucumberJson from 'wdio-cucumberjs-json-reporter';
+
 
 export const config = {
     //
@@ -52,7 +55,23 @@ export const config = {
     // https://saucelabs.com/platform/platform-configurator
     //
     capabilities: [{
-        browserName: 'chrome'
+        browserName: 'chrome',
+        'cjson:metadata': {
+            browser: {
+                name: 'chrome',
+                version: '126',
+            },
+            // for an app
+            app: {
+                name: 'automation.test.exercise',
+                version: '1.2.3',
+            },
+            device: 'MacBook 13',
+            platform: {
+                name: 'OSX',
+                version: '10.12.6'
+            }
+        },
     }],
 
     //
@@ -63,6 +82,7 @@ export const config = {
     //
     // Level of logging verbosity: trace | debug | info | warn | error | silent
     logLevel: 'info',
+    outputDir: 'wdio-logs',
     //
     // Set specific log levels per logger
     // loggers:
@@ -111,7 +131,7 @@ export const config = {
     // Make sure you have the wdio adapter package for the specific framework installed
     // before running any tests.
     framework: 'cucumber',
-    
+
     //
     // The number of times to retry the entire specfile when it fails as a whole
     // specFileRetries: 1,
@@ -127,16 +147,21 @@ export const config = {
     // see also: https://webdriver.io/docs/dot-reporter
     reporters: ['spec', ['allure', {
         outputDir: 'allure-results',
-        disableWebdriverStepsReporting: true,
-        disableWebdriverScreenshotsReporting: true,
-    }]],
+        disableWebdriverStepsReporting: false,
+        disableWebdriverScreenshotsReporting: false
+    }], 'cucumberjs-json',
+        ['cucumberjs-json', {
+            jsonFolder: '.tmp/new/',
+            language: 'en',
+        },
+        ],],
 
     // If you are using Cucumber you need to specify the location of your step definitions.
     cucumberOpts: {
         // <string[]> (file/dir) require files before executing features
         require: ['./step-definitions/*.js'],
         // <boolean> show full backtrace for errors
-        backtrace: false,
+        backtrace: true,
         // <string[]> ("extension:module") require files with the given EXTENSION after requiring MODULE (repeatable)
         requireModule: [],
         // <boolean> invoke formatters without executing steps
@@ -175,6 +200,10 @@ export const config = {
      */
     // onPrepare: function (config, capabilities) {
     // },
+    onPrepare: () => {
+        // Remove the `.tmp/` folder that holds the json and report files
+        return fs.rm('.tmp/', { recursive: true });
+    },
     /**
      * Gets executed before a worker process is spawned and can be used to initialize specific service
      * for that worker as well as modify runtime environments in an async fashion.
@@ -213,6 +242,17 @@ export const config = {
      * @param {object}         browser      instance of created browser/device session
      */
     // before: function (capabilities, specs) {
+    // },
+    // before: async function (capabilities, specs) {
+    //     await browser.addCommand('waitForPageToLoad', async function (timeout = 10000) {
+    //         await this.waitUntil(async () => {
+    //             const state = await this.execute(() => document.readyState);
+    //             return state === 'complete';
+    //         }, {
+    //             timeout: timeout,
+    //             timeoutMsg: 'Page did not load within the timeout period'
+    //         });
+    //     });
     // },
     /**
      * Runs before a WebdriverIO command gets executed.
@@ -262,9 +302,11 @@ export const config = {
     // },
     afterStep: async function (step, scenario, { error, duration, passed }, context) {
         if (error) {
-          await browser.takeScreenshot();
+            await browser.takeScreenshot();
+
+            cucumberJson.attach(await browser.takeScreenshot(), 'image/png');
         }
-      },
+    },
     /**
      *
      * Runs after a Cucumber Scenario.
@@ -285,7 +327,7 @@ export const config = {
      */
     // afterFeature: function (uri, feature) {
     // },
-    
+
     /**
      * Runs after a WebdriverIO command gets executed
      * @param {string} commandName hook command name
@@ -320,28 +362,37 @@ export const config = {
      * @param {Array.<Object>} capabilities list of capabilities details
      * @param {<Object>} results object containing test results
      */
+    onComplete: () => {
+        // Generate the report when it all tests are done
+        generate({
+            // Required
+            // This part needs to be the same path where you store the JSON files
+            // default = '.tmp/json/'
+            jsonDir: '.tmp/json/',
+            reportPath: '.tmp/report/',
+            // for more options see https://github.com/wswebcreation/multiple-cucumber-html-reporter#options
+        });
+    }
     // onComplete: function(exitCode, config, capabilities, results) {
     // },
-    onComplete: function() {
-        const reportError = new Error('Could not generate Allure report')
-        const generation = allure(['generate', 'allure-results', '--clean'])
-        return new Promise((resolve, reject) => {
-            const generationTimeout = setTimeout(
-                () => reject(reportError),
-                5000)
+    // onComplete: function() {
+    //     const reportError = new Error('Could not generate Allure report')
+    //     const generation = allure(['generate', 'allure-results', '--clean'])
+    //     return new Promise((resolve, reject) => {
+    //         const generationTimeout = setTimeout(
+    //             () => reject(reportError),
+    //             5000)
 
-            generation.on('exit', function(exitCode) {
-                clearTimeout(generationTimeout)
+    //         generation.on('exit', function(exitCode) {
+    //             clearTimeout(generationTimeout)
 
-                if (exitCode !== 0) {
-                    return reject(reportError)
-                }
-
-                console.log('Allure report successfully generated')
-                resolve()
-            })
-        })
-    }
+    //             if (exitCode !== 0) {
+    //                 return reject(reportError)
+    //             }
+    //             resolve()
+    //         })
+    //     })
+    // }
     /**
     * Gets executed when a refresh happens.
     * @param {string} oldSessionId session ID of the old session

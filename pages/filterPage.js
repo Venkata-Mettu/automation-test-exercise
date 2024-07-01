@@ -68,7 +68,7 @@ class FilterPage extends BasePage {
         
         await browser.url(await browser.getUrl()+`&low-price=${filters.lowerPriceBound}.0&high-price=${filters.upperPriceBound}`);
         await this.goBtn.click();
-        
+        await browser.pause(1000);
     }
 
 }

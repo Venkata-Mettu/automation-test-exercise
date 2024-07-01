@@ -1,4 +1,4 @@
-import { $ } from '@wdio/globals'
+import { $, expect } from '@wdio/globals'
 import BasePage from './basePage.js';
 
 /**
@@ -19,11 +19,12 @@ class MobilePhonesPage extends BasePage {
         const length = await this.itemsList.length;
         console.log(`*************************`,length);
         await this.itemsList.forEach(async (element) => {
+
             const phoneName = await element.getText();
-    console.log(phoneName);
-            expect(element).toHaveText(
-                expect.stringContaining(itemName));
-        });
+            console.log(phoneName);
+
+            await expect(element).toBeDisplayed()
+            await expect(element).toHaveTextContaining(itemName)        });
     
     }
 }
