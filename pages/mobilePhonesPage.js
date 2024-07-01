@@ -8,7 +8,6 @@ class MobilePhonesPage extends BasePage {
     }
 
     async verifyListdItemsWithNameContaining(itemName) {
-        const length = await this.itemsList.length;
         await this.itemsList.forEach(async (element) => {
 
             const displayedItemName = await element.getText();
