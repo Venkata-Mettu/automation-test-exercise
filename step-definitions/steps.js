@@ -1,5 +1,4 @@
 import { Given, When, Then } from '@wdio/cucumber-framework';
-import { expect, $ } from '@wdio/globals'
 
 import HomePage from '../pages/homePage.js';
 import MobilePhonesPage from '../pages/mobilePhonesPage.js';
@@ -23,6 +22,5 @@ When(/^I apply below filters$/, async (dataTable) => {
 
 
 Then(/^I should see list of Samsung phones$/, async () => {
-
     await MobilePhonesPage.verifyListdItemsWithNameContaining('Samsung');
 });

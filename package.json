@@ -1,5 +1,17 @@
 {
   "name": "automation-test-exercise",
+  "version": "0.1.0",
+  "description": "This framework designed using WebDriverIO, Cucumber, Multiple Cucumber HTML Reporter and Allure reporting",
+  "keywords": [
+    "webdriverio",
+    "cucumber",
+    "pom",
+    "cucumber HTML Reports",
+    "allure"
+  ],
+  "author": "Venkata Mettu",
+  "license": "ISC",
+  "private": true,
   "type": "module",
   "devDependencies": {
     "@wdio/allure-reporter": "8.38.0",
@@ -8,12 +20,14 @@
     "@wdio/local-runner": "^8.39.0",
     "@wdio/spec-reporter": "^8.39.0",
     "allure-commandline": "^2.29.0",
+    "geckodriver": "^4.4.1",
     "multiple-cucumber-html-reporter": "^3.6.2",
     "wdio-cucumberjs-json-reporter": "^5.2.1",
     "wdio-wait-for": "^3.0.11"
   },
   "scripts": {
-    "wdio": "wdio run ./wdio.conf.js",
+    "test": "wdio run ./wdio.conf.js",
+    "openreports": "allure open",
     "allure-report": "allure generate ./allure-results -o ./allure-report --clean && allure open ./allure-report"
   }
 }
