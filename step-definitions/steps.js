@@ -21,6 +21,6 @@ When(/^I apply below filters$/, async (dataTable) => {
 });
 
 
-Then(/^I should see list of Samsung phones$/, async () => {
-    await MobilePhonesPage.verifyListdItemsWithNameContaining('Samsung');
+Then(/^I should see list of (\w+) phones$/, async (brand) => {
+    await MobilePhonesPage.verifyListdItemsWithNameContaining(brand);
 });

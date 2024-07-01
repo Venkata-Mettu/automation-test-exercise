@@ -9,7 +9,7 @@ class HomePage extends BasePage {
     }
     
     /**
-     * overwrite specific options to adapt it to basepage object
+     * overwrite basepage object
      */
     open () {
         return super.open('');
