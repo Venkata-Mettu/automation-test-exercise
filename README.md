@@ -75,3 +75,7 @@ or
 ```sh
 npm run allure-report
 ```
+
+### Logging
+
+Logging is implemented using wdio-logs to capture test execution details, errors, and debugging information. The log files are stored in the wdio-logs folder under the project root directory

@@ -23,7 +23,7 @@ export const config = {
                 name: 'automation.test.exercise',
                 version: '1.2.3',
             },
-            device: 'MacBook 13',
+            device: 'MacBook Air M2,2022',
             platform: {
                 name: 'OSX',
                 version: '14.5'
